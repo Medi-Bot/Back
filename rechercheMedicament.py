@@ -1,3 +1,5 @@
+from effets_indesirables import recuperer_effets_indesirables
+
 def rechercher_mot_dans_fichier(fichier, mot):
     with open(fichier, 'r', encoding='utf-8') as f:
         lignes = f.readlines()
@@ -32,12 +34,14 @@ if resultats:
         if 0 <= choix_numero < len(resultats):
             ligne_choisie = resultats[choix_numero]
             print(f"Vous avez choisi : {ligne_choisie}")
-            medicament_id = ligne_choisie.split()[0]
+            medicament_id = ligne_choisie.split()[0]  # Assure-toi que l'ID est bien en première position
             id_medicament = int(medicament_id)
 
             # Modifier l'URL avec l'ID trouvé
             url_modifiee = modifier_url(medicament_id)
             print(f"L'URL modifiée est : {url_modifiee}")
+
+            effets = recuperer_effets_indesirables(url_modifiee)
 
         else:
             print("Numéro de choix invalide.")
