@@ -5,23 +5,15 @@ import com.medibot.back.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
-
-import javax.crypto.*;
-import javax.crypto.spec.PBEKeySpec;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class SqliteActions {
@@ -72,6 +64,11 @@ public class SqliteActions {
 
     public static boolean CorrectPassword(){
         return CorrectPassword(CurrentBase, CurrentPassword);
+    }
+
+    public static List<String> AllExistingBases(){
+        File dir = new File(".");
+        return Arrays.stream(Objects.requireNonNullElse(dir.listFiles((d, name) -> name.endsWith(".db")), new File[]{})).map(file -> file.getName().replace(".db", "")).toList();
     }
 
     /**
