@@ -1,6 +1,5 @@
 from transformers import pipeline
 from effets_indesirables import recuperer_effets_indesirables
-from rechercheEffet import rechercher_medicament_par_symptome
 
 nlp = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
@@ -36,7 +35,7 @@ def afficher_menu():
     print("1. Chercher un médicament par nom")
     print("2. Chercher un médicament par symptôme")
     print("3. Obtenir une phrase pour évaluer un symptôme")
-    print("4. Chercher un médicament par nom et symptôme")
+    print("4. Chercher un ou plusieurs médicaments par symptôme")
     print("5. Quitter")
 
 def rechercher_medicament_par_nom_et_symptome(medicament, symptome, fichier_effets_secondaires):
@@ -45,31 +44,33 @@ def rechercher_medicament_par_nom_et_symptome(medicament, symptome, fichier_effe
             lignes = f.readlines()
             for i in range(len(lignes)):
                 if medicament.lower() in lignes[i].lower():
-                    # On suppose que les effets secondaires suivent le nom du médicament
-                    effets_line = lignes[i + 1] if i + 1 < len(lignes) else ""
-                    
-                    # Extraction des effets secondaires
-                    effets_dict = eval(effets_line.split("Effets secondaires :")[1].strip())
-                    
-                    # Vérification dans chaque catégorie d'effets
-                    for frequence, effets in effets_dict.items():
-                        for effet in effets:
-                            if symptome.lower() in effet.lower():
-                                return f"Résultat trouvé : {medicament} peut causer {symptome}."
+                    # Vérifiez si la ligne suivante existe avant d'y accéder
+                    if i + 1 < len(lignes):
+                        effets_line = lignes[i + 1]
+                        # Extraction des effets secondaires
+                        effets_dict = eval(effets_line.split("Effets secondaires :")[1].strip())
+                        
+                        # Vérification dans chaque catégorie d'effets
+                        for frequence, effets in effets_dict.items():
+                            for effet in effets:
+                                if symptome.lower() in effet.lower():
+                                    return f"{medicament} peut causer '{symptome}' ({frequence})."
+                    else:
+                        return f"Aucun effet secondaire connu pour {medicament}."
     except FileNotFoundError:
         print(f"Le fichier {fichier_effets_secondaires} est introuvable.")
     except Exception as e:
         print(f"Erreur lors de la lecture du fichier : {e}")
     
-    return f"Aucun effet secondaire connu pour {medicament} ne cause {symptome}."
-
-# Exemple d'appel
-medicament = "PARACETAMOL ARROW LAB 500 mg"
-symptome = "rougeur"
-resultat = rechercher_medicament_par_nom_et_symptome(medicament, symptome, "EffetsSecondaires.txt")
-print(resultat)
+    return f"Aucun effet secondaire connu pour {medicament} ne cause '{symptome}'."
 
 
+def rechercher_medicaments_et_symptomes(liste_medicaments, symptome, fichier_effets_secondaires):
+    resultats = []
+    for medicament in liste_medicaments:
+        resultat = rechercher_medicament_par_nom_et_symptome(medicament, symptome, fichier_effets_secondaires)
+        resultats.append(resultat)
+    return resultats
 
 def main():
     fichier_liste_medicaments = 'Medicaments.txt'
@@ -107,7 +108,7 @@ def main():
 
         elif choix == '2':
             symptome = input("Indiquez le symptôme que vous ressentez : ")
-            resultats_symptomes = rechercher_medicament_par_symptome(symptome, fichier_effets_secondaires)
+            resultats_symptomes = rechercher_medicaments_et_symptomes([symptome], symptome, fichier_effets_secondaires)
 
             if resultats_symptomes:
                 print(f"Médicaments potentiels pour le symptôme '{symptome}':")
@@ -122,10 +123,14 @@ def main():
             print(f"Voici la phrase à copier : {phrase}")
 
         elif choix == '4':
-            medicament = interroger_utilisateur_medicament()
+            liste_medicaments_input = input("Indiquez les médicaments séparés par une virgule : ")
+            liste_medicaments = [med.strip() for med in liste_medicaments_input.split(',')]
             symptome = interroger_utilisateur_symptome()
-            resultat = rechercher_medicament_par_nom_et_symptome(medicament, symptome, fichier_effets_secondaires)
-            print(resultat)
+            resultats = rechercher_medicaments_et_symptomes(liste_medicaments, symptome, fichier_effets_secondaires)
+
+            print(f"Résultats pour le symptôme '{symptome}' :")
+            for resultat in resultats:
+                print(resultat)
 
         elif choix == '5':
             print("Au revoir!")
@@ -136,3 +141,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
