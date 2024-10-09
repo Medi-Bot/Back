@@ -21,6 +21,9 @@ def modifier_url(specid):
 def interroger_utilisateur_medicament():
     return input("Indiquez le médicament dont vous voulez des renseignements : ")
 
+def interroger_utilisateur_symptome():
+    return input("Indiquez le symptôme que vous souhaitez évaluer : ")
+
 def generer_phrase(symptome):
     phrase = (
         f"Je cherche des conseils médicaux pour une personne qui souffre de '{symptome}'. "
@@ -33,7 +36,40 @@ def afficher_menu():
     print("1. Chercher un médicament par nom")
     print("2. Chercher un médicament par symptôme")
     print("3. Obtenir une phrase pour évaluer un symptôme")
-    print("4. Quitter")
+    print("4. Chercher un médicament par nom et symptôme")
+    print("5. Quitter")
+
+def rechercher_medicament_par_nom_et_symptome(medicament, symptome, fichier_effets_secondaires):
+    try:
+        with open(fichier_effets_secondaires, 'r', encoding='utf-8') as f:
+            lignes = f.readlines()
+            for i in range(len(lignes)):
+                if medicament.lower() in lignes[i].lower():
+                    # On suppose que les effets secondaires suivent le nom du médicament
+                    effets_line = lignes[i + 1] if i + 1 < len(lignes) else ""
+                    
+                    # Extraction des effets secondaires
+                    effets_dict = eval(effets_line.split("Effets secondaires :")[1].strip())
+                    
+                    # Vérification dans chaque catégorie d'effets
+                    for frequence, effets in effets_dict.items():
+                        for effet in effets:
+                            if symptome.lower() in effet.lower():
+                                return f"Résultat trouvé : {medicament} peut causer {symptome}."
+    except FileNotFoundError:
+        print(f"Le fichier {fichier_effets_secondaires} est introuvable.")
+    except Exception as e:
+        print(f"Erreur lors de la lecture du fichier : {e}")
+    
+    return f"Aucun effet secondaire connu pour {medicament} ne cause {symptome}."
+
+# Exemple d'appel
+medicament = "PARACETAMOL ARROW LAB 500 mg"
+symptome = "rougeur"
+resultat = rechercher_medicament_par_nom_et_symptome(medicament, symptome, "EffetsSecondaires.txt")
+print(resultat)
+
+
 
 def main():
     fichier_liste_medicaments = 'Medicaments.txt'
@@ -41,7 +77,7 @@ def main():
 
     while True:
         afficher_menu()
-        choix = input("Choisissez une option (1, 2, 3 ou 4) : ").strip()
+        choix = input("Choisissez une option (1, 2, 3, 4 ou 5) : ").strip()
 
         if choix == '1':
             medicament_a_rechercher = interroger_utilisateur_medicament()
@@ -86,11 +122,17 @@ def main():
             print(f"Voici la phrase à copier : {phrase}")
 
         elif choix == '4':
+            medicament = interroger_utilisateur_medicament()
+            symptome = interroger_utilisateur_symptome()
+            resultat = rechercher_medicament_par_nom_et_symptome(medicament, symptome, fichier_effets_secondaires)
+            print(resultat)
+
+        elif choix == '5':
             print("Au revoir!")
             break
 
         else:
-            print("Option invalide, veuillez choisir 1, 2, 3 ou 4.")
+            print("Option invalide, veuillez choisir 1, 2, 3, 4 ou 5.")
 
 if __name__ == "__main__":
     main()
