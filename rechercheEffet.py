@@ -1,3 +1,4 @@
+#Utiliser pour le programme IA
 def rechercher_medicament_par_symptome(symptome, fichier):
     resultats = []
     try:
@@ -19,6 +20,31 @@ def rechercher_medicament_par_symptome(symptome, fichier):
                             medicament = None 
     except FileNotFoundError:
         print(f"Le fichier {fichier} est introuvable.")
+    
+    return resultats
+
+#Utiliser pour le programme IA_argument
+def rechercher_medicament_par_symptome2(symptome, fichier_effets_secondaires):
+    resultats = []
+    try:
+        with open(fichier_effets_secondaires, 'r', encoding='utf-8') as f:
+            lignes = f.readlines()
+            for i in range(len(lignes)):
+                # Recherchez si le symptôme apparaît dans la ligne actuelle
+                if 'Effets secondaires :' in lignes[i]:
+                    try:
+                        effets_dict = eval(lignes[i].split("Effets secondaires :")[1].strip())
+                        for frequence, effets in effets_dict.items():
+                            for effet in effets:
+                                if symptome.lower() in effet.lower():
+                                    # Si un médicament est trouvé pour le symptôme
+                                    medicament = lignes[i-1].strip()  # Supposons que le nom du médicament soit juste au-dessus
+                                    resultats.append(medicament)
+                                    break
+                    except (IndexError, SyntaxError):
+                        continue
+    except FileNotFoundError:
+        print(f"Le fichier {fichier_effets_secondaires} est introuvable.")
     
     return resultats
 
