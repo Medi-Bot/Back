@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -102,5 +103,10 @@ public class MainController {
     @GetMapping("/profiles")
     public List<String> getProfiles(){
         return SqliteActions.AllExistingBases();
+    }
+
+    @PostMapping("/request")
+    public void request(@RequestBody String request){
+        service.addHistoriqueCommunication(new HistoriqueCommunication(request, request, "reponse + " + request));
     }
 }
