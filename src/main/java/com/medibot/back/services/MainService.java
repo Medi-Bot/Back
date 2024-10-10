@@ -7,6 +7,8 @@ import com.medibot.back.sqlite.SqliteActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,7 +43,21 @@ public class MainService {
     public List<MedicamentUtilise> getAllMedicamentUtilise(){
         return medicamentUtiliseRepository.findAll();
     }
-    
+
+    public List<MedicamentUtilise> getAllMedicamentUtiliseNow() {
+        LocalDate localDate = LocalDate.now();
+        List<MedicamentUtilise> allMedicamentUtilise = getAllMedicamentUtilise();
+        List<MedicamentUtilise> allMedicamentUtiliseNow = new ArrayList<>();
+        for (MedicamentUtilise medicamentUtilise : allMedicamentUtilise) {
+            LocalDate startDate = LocalDate.parse(medicamentUtilise.id.dateDebut.split("T")[0]);
+            LocalDate endDate = LocalDate.parse(medicamentUtilise.dateFin.split("T")[0]);
+            if (localDate.isAfter(startDate) && localDate.isBefore(endDate)) {
+                allMedicamentUtiliseNow.add(medicamentUtilise);
+            }
+        }
+        return allMedicamentUtiliseNow;
+    }
+
     public List<Poids> getAllPoids(){
         return poidsRepository.findAll();
     }
@@ -56,7 +72,7 @@ public class MainService {
         dto.historiqueCommunications = getAllHistoriqueCommunication();
         dto.poids = getAllPoids();
         dto.informations = getAllInformations();
-        dto.medicamentUtilises = getAllMedicamentUtilise();
+        dto.medicamentUtilises = getAllMedicamentUtiliseNow();
         dto.tailles = getAllTaille();
         return dto;
     }
