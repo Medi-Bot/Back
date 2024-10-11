@@ -49,8 +49,8 @@ public class MainService {
         List<MedicamentUtilise> allMedicamentUtilise = getAllMedicamentUtilise();
         List<MedicamentUtilise> allMedicamentUtiliseNow = new ArrayList<>();
         for (MedicamentUtilise medicamentUtilise : allMedicamentUtilise) {
-            LocalDate startDate = LocalDate.parse(medicamentUtilise.id.dateDebut.split("T")[0]);
-            LocalDate endDate = LocalDate.parse(medicamentUtilise.dateFin.split("T")[0]);
+            LocalDate startDate = LocalDate.parse(medicamentUtilise.id.dateDebut.split(" ")[0]);
+            LocalDate endDate = LocalDate.parse(medicamentUtilise.dateFin.split(" ")[0]);
             if (localDate.isAfter(startDate) && localDate.isBefore(endDate)) {
                 allMedicamentUtiliseNow.add(medicamentUtilise);
             }
@@ -72,7 +72,7 @@ public class MainService {
         dto.historiqueCommunications = getAllHistoriqueCommunication();
         dto.poids = getAllPoids();
         dto.informations = getAllInformations();
-        dto.medicamentUtilises = getAllMedicamentUtiliseNow();
+        dto.medicamentUtilises = getAllMedicamentUtilise();
         dto.tailles = getAllTaille();
         return dto;
     }

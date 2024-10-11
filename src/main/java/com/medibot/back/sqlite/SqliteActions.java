@@ -257,7 +257,7 @@ public class SqliteActions {
         List<MedicamentUtilise> medicamentUtilises = new ArrayList<>();
         ResultSet res = statement.executeQuery("select * from MedicamentUtilise;");
         while (res.next()){
-            medicamentUtilises.add(new MedicamentUtilise(new MedicamentUtilise.MedicamentUtiliseId(res.getString("date_de_debut"), res.getString("nom")),res.getString("date_de_fin"), res.getString("frequence")));
+            medicamentUtilises.add(new MedicamentUtilise(new MedicamentUtilise.MedicamentUtiliseId(res.getString("date_de_debut"), res.getString("nom")),res.getString("frequence"), res.getString("date_de_fin")));
         }
         medicamentUtiliseRepository.saveAll(medicamentUtilises);
     }

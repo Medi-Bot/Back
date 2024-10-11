@@ -4,13 +4,19 @@ import com.medibot.back.dtos.GetAllDTO;
 import com.medibot.back.dtos.ProfileDTO;
 import com.medibot.back.entities.*;
 import com.medibot.back.services.MainService;
+import com.medibot.back.services.PythonService;
 import com.medibot.back.sqlite.SqliteActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping
@@ -19,6 +25,8 @@ public class MainController {
     public MainService service;
     @Autowired
     private SqliteActions sqliteActions;
+    @Autowired
+    private PythonService pythonService;
 
     @GetMapping("/get-all")
     public GetAllDTO getAll(){
@@ -107,6 +115,17 @@ public class MainController {
 
     @PostMapping("/request")
     public void request(@RequestBody String request){
-        service.addHistoriqueCommunication(new HistoriqueCommunication(request, request, "reponse + " + request));
+        List<String> medicamentUtilises = service.getAllMedicamentUtiliseNow().stream().map(e -> e.id.nom).toList();
+        String medicaments = "\"";
+        for(int i = 0; i < medicamentUtilises.size(); i++){
+            medicaments += medicamentUtilises.get(i) + (i == medicamentUtilises.size() - 1 ? "\"" : ", ");
+        }
+        String res = pythonService.executePythonScript("./IA_argument.py", "4", medicaments, "--symptome", request);
+        String pattern = "Resultats";
+        Matcher matcher = Pattern.compile(pattern).matcher(res);
+        if (matcher.find()) {
+            String result = res.substring(matcher.start());
+            service.addHistoriqueCommunication(new HistoriqueCommunication(Timestamp.from(Instant.now()).toString(), request, result));
+        }
     }
 }

@@ -21,7 +21,7 @@ def modifier_url(specid):
 
 def generer_phrase(symptome):
     phrase = (
-        f"Je cherche des conseils médicaux pour une personne qui souffre de '{symptome}'. "
+        f"Je cherche des conseils medicaux pour une personne qui souffre de '{symptome}'. "
         f"Quels traitements ou recommandations recommanderiez-vous ?"
     )
     return phrase
@@ -62,23 +62,23 @@ def rechercher_medicaments_et_symptomes(liste_medicaments, symptome, fichier_eff
     return resultats
 
 def main():
-    parser = argparse.ArgumentParser(description="Recherche de médicaments par nom ou symptôme.")
+    parser = argparse.ArgumentParser(description="Recherche de medicaments par nom ou symptome.")
     parser.add_argument('choix', type=int, help='Choix de l\'option (1, 2, 3, 4 ou 5)')
-    parser.add_argument('parametre', help='Médicament ou symptôme à rechercher')
-    parser.add_argument('--choix_medicament', type=int, help='Numéro du médicament à sélectionner')
-    parser.add_argument('--symptome', help='Symptôme à évaluer pour le choix 4')
+    parser.add_argument('parametre', help='Medicament ou symptome à rechercher')
+    parser.add_argument('--choix_medicament', type=int, help='Numero du medicament à selectionner')
+    parser.add_argument('--symptome', help='Symptome à evaluer pour le choix 4')
 
     args = parser.parse_args()
 
     fichier_liste_medicaments = 'Medicaments.txt'
     fichier_effets_secondaires = 'EffetsSecondaires.txt'
 
-    if args.choix == 1 or args.choix == 5:  # Le choix 5 fait la même chose que le choix 1 mais on choisi le médicament dans la liste donner par le choix 1
+    if args.choix == 1 or args.choix == 5:  # Le choix 5 fait la même chose que le choix 1 mais on choisi le medicament dans la liste donner par le choix 1
         medicament_a_rechercher = args.parametre
         resultats = rechercher_mot_dans_fichier(fichier_liste_medicaments, medicament_a_rechercher)
 
         if resultats:
-            print(f"Les médicaments trouvés contenant '{medicament_a_rechercher}' :")
+            print(f"Les medicaments trouves contenant '{medicament_a_rechercher}' :")
             for i, resultat in enumerate(resultats):
                 print(f"{i + 1}. {resultat}")
             
@@ -89,26 +89,26 @@ def main():
                     print(f"Vous avez choisi : {ligne_choisie}")
                     medicament_id = ligne_choisie.split()[0]
                     url_modifiee = modifier_url(medicament_id)
-                    print(f"L'URL modifiée est : {url_modifiee}")
+                    print(f"L'URL modifiee est : {url_modifiee}")
                     effets_indis = recuperer_effets_indesirables(url_modifiee)
-                    print(f"Effets indésirables : {effets_indis}")
+                    print(f"Effets indesirables : {effets_indis}")
                 else:
-                    print("Numéro de choix invalide.")
+                    print("Numero de choix invalide.")
             else:
-                print("Veuillez fournir un numéro de choix pour le médicament.")
+                print("Veuillez fournir un numero de choix pour le medicament.")
         else:
-            print(f"Le médicament '{medicament_a_rechercher}' n'a pas été trouvé dans la liste.")
+            print(f"Le medicament '{medicament_a_rechercher}' n'a pas ete trouve dans la liste.")
 
     elif args.choix == 2:
         symptome = args.parametre
         resultats_symptomes = rechercher_medicament_par_symptome2(symptome, fichier_effets_secondaires)
 
         if resultats_symptomes:
-            print(f"Médicaments potentiels pour le symptôme '{symptome}':")
+            print(f"Medicaments potentiels pour le symptome '{symptome}':")
             for i, medicament in enumerate(resultats_symptomes):
                 print(f"{i + 1}. {medicament}")
         else:
-            print(f"Aucun médicament trouvé pour le symptôme '{symptome}'.")
+            print(f"Aucun medicament trouve pour le symptome '{symptome}'.")
 
     elif args.choix == 3:
         symptome_a_evaluer = args.parametre
@@ -122,11 +122,11 @@ def main():
         
         if symptome:
             resultats = rechercher_medicaments_et_symptomes(liste_medicaments, symptome, fichier_effets_secondaires)
-            print(f"Résultats pour le symptôme '{symptome}' :")
+            print(f"Resultats pour le symptome '{symptome}' :")
             for resultat in resultats:
                 print(resultat)
         else:
-            print("Veuillez fournir un symptôme avec l'option --symptome.")
+            print("Veuillez fournir un symptome avec l'option --symptome.")
 
     else:
         print("Option invalide, veuillez choisir 1, 2, 3, 4 ou 5.")
